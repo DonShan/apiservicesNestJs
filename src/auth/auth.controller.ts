@@ -20,6 +20,7 @@ export class AuthController {
         console.log({
             dto,
         });
+      
         return this.authService.signin(dto);
     }
 
