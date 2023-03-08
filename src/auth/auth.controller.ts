@@ -23,4 +23,10 @@ export class AuthController {
         return this.authService.signin(dto);
     }
 
+    @Post("forgot-password")
+  async forgotPassword(@Body() dto: { email: string }) {
+    console.log(dto);
+    return this.authService.sendPasswordResetEmail(dto.email);
+  }
+
 }

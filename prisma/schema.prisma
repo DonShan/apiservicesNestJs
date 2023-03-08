@@ -21,6 +21,9 @@ model User {
   firstName String?
   lastName String?
 
+  resetToken       String?
+  resetTokenExpires DateTime?
+
   bookmarks Bookmark[]
 
   @@map("users")
