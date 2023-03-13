@@ -21,8 +21,8 @@ model User {
   firstName String?
   lastName String?
 
-  resetToken       String?
-  resetTokenExpires DateTime?
+  resetToken String? @unique
+  resetTokenExpires DateTime? @unique
 
   bookmarks Bookmark[]
 
