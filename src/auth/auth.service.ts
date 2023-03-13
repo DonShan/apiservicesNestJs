@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AuthDto } from "./dto/auth.dto";
 import * as argon from 'argon2';
@@ -129,7 +129,50 @@ constructor (private prisma: PrismaService, private jwt: JwtService, private con
             }
           });
       }
+      async resetPassword(resetToken: string, password: string) {
+        try {
+          // Find the user with the matching reset token
+          const user = await this.prisma.user.findUnique({
+            where: {
+              resetToken,
+            },
+          });
+        
+          if (!user) {
+            throw new ForbiddenException('Invalid reset token');
+          }
+        
+          // Check if the reset token has expired
+          const now = new Date();
+          if (user.resetTokenExpires < now) {
+            throw new ForbiddenException('Reset token has expired');
+          }
+        
+          // Hash the new password
+          const hash = await argon.hash(password);
+        
+          // Update the user's password hash and clear the reset token
+          const updatedUser = await this.prisma.user.update({
+            where: {
+              id: user.id,
+            },
+            data: {
+              hash,
+              resetToken: resetToken,
+              resetTokenExpires: null,
+            },
+          });
+        
+          return this.signToken(updatedUser.id, updatedUser.email);
+        } catch (error) {
+          if (error instanceof ForbiddenException) {
+            throw error;
+          }
+          throw new InternalServerErrorException();
+        }
+      }
       
+          
 
     
     

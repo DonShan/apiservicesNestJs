@@ -1,4 +1,4 @@
-import { Body, Controller, ParseIntPipe, Post} from "@nestjs/common";
+import { Body, Controller, ForbiddenException, Get, Param, ParseIntPipe, Post, Render} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto } from "./dto/auth.dto";
 
@@ -28,5 +28,11 @@ export class AuthController {
     console.log(dto);
     return this.authService.sendPasswordResetEmail(dto.email);
   }
+
+  @Post('reset-password')
+async resetPassword(@Body() dto: { resetToken: string, password: string }) {
+  return this.authService.resetPassword(dto.resetToken, dto.password);
+}
+
 
 }
