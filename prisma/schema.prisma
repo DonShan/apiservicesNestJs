@@ -23,6 +23,7 @@ model User {
 
   resetToken String? @unique
   resetTokenExpires DateTime? @unique
+  role String @default("user")
 
   bookmarks Bookmark[]
 

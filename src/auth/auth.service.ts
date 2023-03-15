@@ -19,7 +19,7 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  async signup(dto: AuthDto) {
+  async signup(dto: AuthDto, role: string) {
     //generate the password hash
     const hash = await argon.hash(dto.password);
 
@@ -39,6 +39,7 @@ export class AuthService {
           hash,
           resetToken,
           resetTokenExpires,
+          role, // add role here
         },
       });
       console.log(user);
@@ -65,6 +66,13 @@ export class AuthService {
     const pwMatches = await argon.verify(user.hash, dto.password);
 
     if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
+
+    // check user's role
+    if (user.role !== 'admin' && user.role !== 'user' && user.role) {
+      throw new ForbiddenException('Invalid role');
+    }
+
+    console.log(user.role);
 
     return this.signToken(user.id, user.email);
   }
@@ -101,7 +109,6 @@ export class AuthService {
       where: { email },
       data: { resetToken, resetTokenExpires },
     });
-    //email genarater nodemalier
 
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
@@ -140,13 +147,6 @@ export class AuthService {
     );
   }
   async resetPassword(resetToken: string, password: string) {
-    // generate password reset token
-    const resetTokenNew =
-      Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15);
-
-    // set password reset token expiration time
-    const resetTokenExpiresNew = new Date(Date.now() + 3600000); // token will expire in 1 hour
     try {
       // Find the user with the matching reset token
       const user = await this.prisma.user.findUnique({
@@ -168,6 +168,12 @@ export class AuthService {
       // Hash the new password
       const hash = await argon.hash(password);
 
+      const newResetToken =
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15);
+      const newRresetTokenExpires = new Date();
+      newRresetTokenExpires.setMinutes(newRresetTokenExpires.getMinutes() + 15);
+
       // Update the user's password hash and clear the reset token
       const updatedUser = await this.prisma.user.update({
         where: {
@@ -175,8 +181,8 @@ export class AuthService {
         },
         data: {
           hash,
-          resetToken: resetTokenNew,
-          resetTokenExpires: resetTokenExpiresNew,
+          resetToken: newResetToken,
+          resetTokenExpires: newRresetTokenExpires,
         },
       });
 
