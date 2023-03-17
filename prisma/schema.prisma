@@ -20,10 +20,11 @@ model User {
 
   firstName String?
   lastName String?
+  role String @default("user")
 
   resetToken String? @unique
   resetTokenExpires DateTime? @unique
-  role String @default("user")
+  
 
   bookmarks Bookmark[]
 

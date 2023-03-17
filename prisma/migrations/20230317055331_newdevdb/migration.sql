@@ -7,9 +7,9 @@ CREATE TABLE "users" (
     "hash" TEXT NOT NULL,
     "firstName" TEXT,
     "lastName" TEXT,
+    "role" TEXT NOT NULL DEFAULT 'user',
     "resetToken" TEXT,
     "resetTokenExpires" TIMESTAMP(3),
-    "role" TEXT NOT NULL DEFAULT 'user',
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );

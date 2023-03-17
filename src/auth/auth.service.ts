@@ -42,14 +42,13 @@ export class AuthService {
           role, // add role here
         },
       });
-      console.log(user);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           throw new ForbiddenException('Credentials taken');
-          console.log(error.code);
         }
       }
+      console.log(error.code);
       //throw error;
     }
   }
@@ -71,8 +70,6 @@ export class AuthService {
     if (user.role !== 'admin' && user.role !== 'user' && user.role) {
       throw new ForbiddenException('Invalid role');
     }
-
-    console.log(user.role);
 
     return this.signToken(user.id, user.email);
   }

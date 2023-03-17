@@ -1,6 +1,5 @@
 export class ResetPasswordDto {
-    email: string;
-    password: string;
-    resetToken: string;
-  }
-  
+  email: string;
+  password: string;
+  resetToken: string;
+}
